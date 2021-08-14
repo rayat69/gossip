@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gossip/router/delegate.dart';
 import 'package:gossip/router/parser.dart';
-import 'package:gossip/screens/auth_screen.dart';
 import 'package:provider/provider.dart';
 
 // import 'package:gossip/screens/chat_screen.dart';
@@ -14,8 +12,8 @@ void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     final app = await Firebase.initializeApp();
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await FirebaseFirestore.instance.
+    // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
 
     runApp(MultiProvider(
       providers: [

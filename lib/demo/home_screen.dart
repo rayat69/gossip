@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/services.dart';
 import 'package:gossip/models/message_model.dart';
 import 'package:gossip/widgets/drawer.dart';
+import 'package:gossip/widgets/search_delegate.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -18,10 +18,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         drawer: HomeDrawer(),
         appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Theme.of(context).primaryColor,
+          ),
           backgroundColor: Theme.of(context).primaryColor,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: MainSearchDelegate(),
+                );
+              },
               icon: Icon(CupertinoIcons.search),
             ),
           ],
@@ -89,33 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: favorites.length,
-                        itemBuilder: (context, i) {
-                          final user = favorites[i];
-                          return Container(
-                            // height: double.infinity,
-                            width: 80.0,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              // mainAxisSize: MainAxisSize.max,
-                              children: [
-                                ClipOval(
-                                  child: Image(
-                                    image: AssetImage(user.imageUrl),
-                                    height: 60,
-                                    width: 60,
-                                  ),
-                                ),
-                                Center(
-                                  child: Text(user.name),
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      child: ChatList(),
                     ),
                   ],
                 ),
@@ -220,6 +202,53 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ChatList extends StatefulWidget {
+  const ChatList({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _ChatListState createState() => _ChatListState();
+}
+
+class _ChatListState extends State<ChatList> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: favorites.length,
+      itemBuilder: (context, i) {
+        final user = favorites[i];
+        return Container(
+          // height: double.infinity,
+          width: 80.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // mainAxisSize: MainAxisSize.max,
+            children: [
+              ClipOval(
+                child: Image(
+                  image: AssetImage(user.imageUrl),
+                  height: 60,
+                  width: 60,
+                ),
+              ),
+              Center(
+                child: Text(user.name),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -2,21 +2,25 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class FirestoreUser with EquatableMixin {
+  final String id;
   final String? displayName;
   final String email;
   final String? photoUrl;
   final String? phoneNumber;
   final List<String> conversations;
 
-  FirestoreUser.fromJson(Map<String, Object?> json)
-      : displayName = json['displayName'] as String?,
+  FirestoreUser.fromJson(Map<String, Object?> json, String id)
+      : id = id,
+        displayName = json['displayName'] as String?,
         email = json['email'] as String,
         photoUrl = json['photoUrl'] as String?,
         phoneNumber = json['phoneNumber'] as String?,
-        conversations = json['conversations'] as List<String>;
+        conversations =
+            (json['conversations'] as List).map((e) => e.toString()).toList();
 
   FirestoreUser.fromUser(auth.User user)
-      : displayName = user.displayName,
+      : id = user.uid,
+        displayName = user.displayName,
         email = user.email!,
         photoUrl = user.photoURL,
         phoneNumber = user.phoneNumber,
@@ -32,6 +36,9 @@ class FirestoreUser with EquatableMixin {
 
   @override
   List<Object?> get props => [displayName, email, photoUrl, phoneNumber];
+
+  @override
+  bool? get stringify => true;
 }
 
 class User with EquatableMixin {

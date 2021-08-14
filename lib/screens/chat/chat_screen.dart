@@ -2,11 +2,15 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gossip/database/index.dart';
+import 'package:gossip/models/conversation.dart';
 import 'package:gossip/models/message_model.dart';
+import 'package:gossip/screens/chat/widgets/chats.dart';
 
 // keytool -list -v -alias androiddebugkey -keystore C:\Users\rayat\.android\debug.keystore
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final String id;
+  const ChatScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -20,11 +24,13 @@ class _ChatScreenState extends State<ChatScreen>
   late ScrollController _scroll;
   late FocusNode _focusNode;
   late TextEditingController _input;
+  late String _id;
 
   final _listKey = GlobalKey<AnimatedListState>();
 
   @override
   void initState() {
+    _id = widget.id;
     _messages = messages;
     _controller = AnimationController(
       vsync: this,
@@ -64,11 +70,14 @@ class _ChatScreenState extends State<ChatScreen>
         leading: IconButton(
           onPressed: () {},
           splashRadius: 20.0,
-          icon: Chip(
-            label: Text(chats.where((chat) => chat.unread).length.toString()),
-            backgroundColor: Colors.white,
-            labelStyle: TextStyle(
-              color: Theme.of(context).primaryColor,
+          icon: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: Chip(
+              label: Text(chats.where((chat) => chat.unread).length.toString()),
+              backgroundColor: Colors.white,
+              labelStyle: TextStyle(
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           ),
         ),
@@ -96,50 +105,58 @@ class _ChatScreenState extends State<ChatScreen>
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: AnimatedList(
-                initialItemCount: messages.length, key: _listKey,
+              child: CustomScrollView(
                 controller: _scroll,
                 reverse: true,
-                // separatorBuilder: (_, i) => divider!,
-                itemBuilder: (context, i, animation) {
-                  final msg = _messages[i];
-                  final isMe = msg.sender == currentUser;
-
-                  final message = Container(
-                    margin: isMe
-                        ? const EdgeInsets.only(left: 72.0, top: 10, bottom: 10)
-                        : const EdgeInsets.only(
-                            right: 72.0, top: 10, bottom: 10),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    decoration: BoxDecoration(
-                      color: isMe ? Colors.amber[50] : Colors.red[50],
-                      borderRadius: isMe
-                          ? BorderRadius.horizontal(left: Radius.circular(24.0))
-                          : BorderRadius.horizontal(
-                              right: Radius.circular(24.0)),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Center(
+                      child: FutureBuilder<Conversation>(
+                        future: Database.instance.getConversationById(_id),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            print(snapshot.error);
+                          }
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.none:
+                              return Text('Start a new conversation');
+                            case ConnectionState.waiting:
+                              return CircularProgressIndicator();
+                            case ConnectionState.active:
+                            case ConnectionState.done:
+                              if (snapshot.hasData) {
+                                final data = snapshot.data!;
+                                return SizedBox(
+                                  height: 200,
+                                  child: Column(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(data.logo!),
+                                        backgroundColor: Colors.pink,
+                                      ),
+                                      Text('data.title'),
+                                    ],
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                print(snapshot.error);
+                                return Text(snapshot.error.toString());
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            default:
+                              return CircularProgressIndicator();
+                          }
+                        },
+                      ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(msg.time),
-                        SizedBox(height: 4.0),
-                        Text(msg.text),
-                      ],
-                    ),
-                  );
-                  return ScaleTransition(
-                    scale: animation,
-                    alignment:
-                        isMe ? Alignment.centerRight : Alignment.centerLeft,
-                    child: FadeTransition(
-                      opacity: animation,
-                      child: message,
-                    ),
-                  );
-                },
-                // itemCount: messages.length,
+                  ),
+                  ChatsSliver(
+                    listKey: _listKey,
+                    messages: _messages,
+                  ),
+                ],
               ),
             ),
             Row(
@@ -217,7 +234,6 @@ class _ChatScreenState extends State<ChatScreen>
     if (_input.text.isEmpty) {
       return;
     }
-    final time = DateTime.now();
     _messages.insert(
         0,
         Message(
@@ -236,6 +252,4 @@ class _ChatScreenState extends State<ChatScreen>
     // _focusNode.unfocus();
     _input.clear();
   }
-
-  static final _tween = Tween<double>(begin: 1.0, end: 0.85);
 }

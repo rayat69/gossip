@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gossip/models/conversation.dart';
 import 'package:gossip/models/message_model.dart';
 import 'package:gossip/models/user_model.dart' show FirestoreUser;
+import 'package:gossip/utils/exceptions.dart';
 
 part 'user_db.dart';
 part 'conversation_db.dart';
@@ -11,34 +12,40 @@ part 'message_db.dart';
 class Database {
   late CollectionReference<FirestoreUser> userCol;
   late CollectionReference<Conversation> convCol;
-  late CollectionReference<FirestoreMessage> msgCol;
 
   late final FirebaseFirestore _firestore;
   late final FirebaseAuth _auth;
+  late final WriteBatch _batch;
 
   Database._() {
     _firestore = FirebaseFirestore.instance;
     _auth = FirebaseAuth.instance;
+    _batch = _firestore.batch();
 
-    userCol = _firestore.collection('users').withConverter<FirestoreUser>(
+    final _text = _firestore.collection('test').doc('gossip');
+
+    userCol = _text.collection('users').withConverter<FirestoreUser>(
           fromFirestore: (snapshot, _) =>
               FirestoreUser.fromJson(snapshot.data()!, snapshot.id),
           toFirestore: (model, _) => model.toJson(),
         );
-    convCol =
-        _firestore.collection('conversations').withConverter<Conversation>(
-              fromFirestore: (snapshot, _) {
-                return Conversation.fromJson(snapshot.data()!, snapshot.id);
-              },
-              toFirestore: (model, _) => model.toJson(),
-            );
-    msgCol = convCol.doc().collection('messages').withConverter(
+    convCol = _text.collection('conversations').withConverter<Conversation>(
           fromFirestore: (snapshot, _) {
-            return FirestoreMessage.fromJson(snapshot.data()!, snapshot.id);
+            return Conversation.fromJson(snapshot.data()!, snapshot.id);
           },
           toFirestore: (model, _) => model.toJson(),
         );
   }
 
-  static get instance => Database._();
+  CollectionReference<FirestoreMessage> msgCol(String convId) => convCol
+      .doc(convId)
+      .collection('messages')
+      .withConverter<FirestoreMessage>(
+        fromFirestore: (snapshot, _) {
+          return FirestoreMessage.fromJson(snapshot.data()!, snapshot.id);
+        },
+        toFirestore: (model, _) => model.toJson(),
+      );
+
+  static Database get instance => Database._();
 }

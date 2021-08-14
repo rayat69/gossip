@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import './user_model.dart';
 
-class FirestoreMessage {
+class FirestoreMessage with EquatableMixin {
   final String id;
   final String sender;
   final Timestamp time;
@@ -47,6 +47,12 @@ class FirestoreMessage {
         'isLiked': isLiked,
         'unread': unread,
       };
+
+  @override
+  List<Object?> get props => [id, sender, time, text, isLiked, unread];
+
+  @override
+  bool? get stringify => true;
 }
 
 class Message with EquatableMixin {
