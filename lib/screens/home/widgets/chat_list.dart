@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gossip/database/index.dart';
-import 'package:gossip/models/conversation.dart';
+import 'package:gossip/mock/conversation.dart';
 // import 'package:gossip/models/message_model.dart';
 import 'package:gossip/screens/home/widgets/item.dart';
 

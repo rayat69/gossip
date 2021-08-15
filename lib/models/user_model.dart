@@ -24,7 +24,7 @@ class FirestoreUser with EquatableMixin {
         email = user.email!,
         photoUrl = user.photoURL,
         phoneNumber = user.phoneNumber,
-        conversations = [];
+        conversations = const [];
 
   Map<String, Object?> toJson() => {
         'displayName': displayName,

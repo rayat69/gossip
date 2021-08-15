@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gossip/models/conversation.dart';
-import 'package:gossip/models/message_model.dart';
-import 'package:gossip/models/user_model.dart' show FirestoreUser;
+import 'package:gossip/mock/conversation.dart';
+import 'package:gossip/mock/message_model.dart';
+import 'package:gossip/mock/user_model.dart';
+// import 'package:gossip/models/conversation.dart';
+// import 'package:gossip/models/message_model.dart';
+// import 'package:gossip/models/user_model.dart' show FirestoreUser;
 import 'package:gossip/utils/exceptions.dart';
+// import 'package:string_validator/string_validator.dart';
 
 part 'user_db.dart';
 part 'conversation_db.dart';
@@ -25,14 +29,12 @@ class Database {
     final _text = _firestore.collection('test').doc('gossip');
 
     userCol = _text.collection('users').withConverter<FirestoreUser>(
-          fromFirestore: (snapshot, _) =>
-              FirestoreUser.fromJson(snapshot.data()!, snapshot.id),
+          fromFirestore: (snapshot, _) => FirestoreUser.fromJson(snapshot),
+          // FirestoreUser.fromJson(snapshot.data()!, snapshot.id),
           toFirestore: (model, _) => model.toJson(),
         );
     convCol = _text.collection('conversations').withConverter<Conversation>(
-          fromFirestore: (snapshot, _) {
-            return Conversation.fromJson(snapshot.data()!, snapshot.id);
-          },
+          fromFirestore: (snapshot, _) => Conversation.fromJson(snapshot),
           toFirestore: (model, _) => model.toJson(),
         );
   }
@@ -42,7 +44,7 @@ class Database {
       .collection('messages')
       .withConverter<FirestoreMessage>(
         fromFirestore: (snapshot, _) {
-          return FirestoreMessage.fromJson(snapshot.data()!, snapshot.id);
+          return FirestoreMessage.fromJson(snapshot);
         },
         toFirestore: (model, _) => model.toJson(),
       );

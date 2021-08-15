@@ -32,9 +32,17 @@ extension ConvDB on Database {
             ),
           )
               .update(userDoc, {
-            'conversations': [id, ...user.data()!.conversations],
+            'conversations': [
+              id,
+              if (user.data()?.conversations != null)
+                ...user.data()!.conversations!
+            ],
           }).update(friendDoc, {
-            'conversations': [id, ...user.data()!.conversations],
+            'conversations': [
+              id,
+              if (user.data()?.conversations != null)
+                ...user.data()!.conversations!
+            ],
           });
         } catch (e, s) {
           return Future.error(e, s);

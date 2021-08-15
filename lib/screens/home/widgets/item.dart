@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gossip/models/conversation.dart';
-import 'package:gossip/models/user_model.dart';
+import 'package:gossip/mock/conversation.dart';
+import 'package:gossip/mock/user_model.dart';
 import 'package:gossip/router/delegate.dart';
 import 'package:provider/provider.dart';
 

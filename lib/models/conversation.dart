@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+// import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:gossip/database/index.dart';
 import 'package:gossip/models/user_model.dart';
+
+// part 'conversation.g.dart';
+// part 'conversation.freezed.dart';
 
 class Conversation with EquatableMixin {
   final String id;
@@ -10,19 +14,14 @@ class Conversation with EquatableMixin {
   final ConvType type;
   final String? logo;
 
-  @override
-  bool? get stringify => true;
-
-  @override
-  List<Object?> get props => [id, users, createdAt, type, logo];
-
   Conversation({
     required this.id,
     required this.users,
     required this.createdAt,
-    required this.type,
     required this.logo,
-  }) : assert(users.length >= 2);
+    this.type = ConvType.PRIVATE,
+  })  : assert(users.length >= 2),
+        assert(type == ConvType.GROUP || users.length == 2);
 
   factory Conversation.fromJson(Map<String, Object?> json, String id) =>
       Conversation(
@@ -41,9 +40,15 @@ class Conversation with EquatableMixin {
         'type': type.val,
         'logo': logo,
       };
+
+  @override
+  bool? get stringify => true;
+
+  @override
+  List<Object?> get props => [id, users, createdAt, type, logo];
 }
 
-enum ConvType { GROUP, PRIVATE }
+enum ConvType { PRIVATE, GROUP }
 
 extension ConvTypeVal on ConvType {
   int get val => this.index;

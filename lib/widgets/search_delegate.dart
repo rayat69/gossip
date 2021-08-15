@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gossip/database/index.dart';
-import 'package:gossip/models/user_model.dart';
+import 'package:gossip/mock/user_model.dart';
 
 class MainSearchDelegate extends SearchDelegate<String?> {
   @override

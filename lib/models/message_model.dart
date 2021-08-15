@@ -7,9 +7,11 @@ class FirestoreMessage with EquatableMixin {
   final String id;
   final String sender;
   final Timestamp time;
-  final String text;
+  final String? text;
+  final List<String>? images;
   final bool isLiked;
   final bool unread;
+  final MessageType type;
 
   factory FirestoreMessage.newConv(String sender, String id) =>
       FirestoreMessage(
@@ -25,10 +27,15 @@ class FirestoreMessage with EquatableMixin {
     required this.id,
     required this.sender,
     required this.time,
-    required this.text,
     required this.isLiked,
     required this.unread,
-  });
+    this.type = MessageType.TEXT,
+    this.text,
+    this.images,
+  })  : assert(text == null || images == null),
+        assert(type == MessageType.TEXT && text != null && text.isNotEmpty),
+        assert(
+            type == MessageType.IMAGE && images != null && images.isNotEmpty);
 
   factory FirestoreMessage.fromJson(Map<String, Object?> json, String id) =>
       FirestoreMessage(
@@ -53,6 +60,14 @@ class FirestoreMessage with EquatableMixin {
 
   @override
   bool? get stringify => true;
+}
+
+enum MessageType { TEXT, IMAGE }
+
+extension MessageTypeVal on MessageType {
+  int get val => this.index;
+
+  static MessageType type(int index) => MessageType.values.elementAt(index);
 }
 
 class Message with EquatableMixin {

@@ -34,6 +34,7 @@ dependencies:
 
   equatable: ^2.0.3
   provider:
+  freezed_annotation:
 
   string_validator: ^0.3.0
 
@@ -45,6 +46,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  freezed:
+  build_runner:
+  json_serializable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
